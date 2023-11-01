@@ -23,6 +23,12 @@ let notes = [
         content: "GET and POST are the most important methods of HTTP protocol",
         date: "2022-05-30T19:20:14.298Z",
         important: true
+    },
+    {
+        id: 4,
+        content: " HTTP protocol",
+        date: "2022-06-30T19:27:14.298Z",
+        important: false
     }
 ]
 app.get('/', (request, response) => {
@@ -81,4 +87,12 @@ app.post('/api/notes',(request,response) => {
     notes = notes.concat(note)
 
     response.json(note)
+})
+
+app.put('/api/notes/:id',(request,response) => {
+    if(!notes.find(note => note.id === request.body.id)){
+        return response.status(404).json({error :'bad request'})
+    }
+    const newNotes = notes.map(note => note.id === request.body.id ? request.body : note)
+    response.json(newNotes)
 })
