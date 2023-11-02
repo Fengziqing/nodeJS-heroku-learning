@@ -3,6 +3,7 @@ const app = express()
 const cors =require('cors')
 
 app.use(express.json())
+app.use(express.static('build'))
 app.use(cors())
 
 let notes = [
@@ -77,9 +78,14 @@ app.post('/api/notes',(request,response) => {
         })
     }
 
+    if(notes.find(note => note.content === body.content)){
+        return response.status(400).json({
+            error: 'commit same content, please correct it and try again'
+        })
+    }
     const note = {
         content: body.content,
-        important: body.important,
+        important: body.important||false,
         date: new Date(),
         id: generateId(),
     }
@@ -94,5 +100,6 @@ app.put('/api/notes/:id',(request,response) => {
         return response.status(404).json({error :'bad request'})
     }
     const newNotes = notes.map(note => note.id === request.body.id ? request.body : note)
+    notes = newNotes
     response.json(newNotes)
 })
