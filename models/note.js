@@ -11,10 +11,18 @@ mongoose.connect(url)
 })
 
 const noteSchema = new mongoose.Schema({
-    content: String,
-    date: Date,
-    important: Boolean,
+    content:{
+        type: String,
+        minLength: 5, //内置
+        required: true//内置
+    },
+    date:{
+        type: Date,
+        required: true
+    },
+    important: Boolean
 })
+
 noteSchema.set('toJSON',{
     transform:(document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()

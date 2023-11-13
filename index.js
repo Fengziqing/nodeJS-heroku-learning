@@ -8,32 +8,6 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
 
-// let notes = [
-//     {
-//         id: 1,
-//         content: "HTML is easy",
-//         date: "2022-05-30T17:30:31.098Z",
-//         important: true
-//     },
-//     {
-//         id: 2,
-//         content: "Browser can execute only Javascript",
-//         date: "2022-05-30T18:39:34.091Z",
-//         important: false
-//     },
-//     {
-//         id: 3,
-//         content: "GET and POST are the most important methods of HTTP protocol",
-//         date: "2022-05-30T19:20:14.298Z",
-//         important: true
-//     },
-//     {
-//         id: 4,
-//         content: " HTTP protocol",
-//         date: "2022-06-30T19:27:14.298Z",
-//         important: false
-//     }
-// ]
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
@@ -50,15 +24,6 @@ app.listen(PORT, () => {
 })
 
 app.get('/api/notes/:id',(request, response, next) => {
-    // const id = Number(request.params.id)
-    // const note = notes.find(note => {
-    //     return note.id === id
-    // })
-    // if(note){
-    //     response.json(note)  
-    // }else{
-    //     response.status(404).end()
-    // }
     Note.findById(request.params.id)
     .then(note => {
         if(note){
@@ -82,18 +47,8 @@ app.delete('/api/notes/:id',(request,response,next) => {//暂时没有这个功�
     // response.status(204).end()
 })
 
-const generateId = () => {
-    const maxId = notes.length>0 ? Math.max(...notes.map(n => n.id)) : 0
-    return maxId + 1
-}
-app.post('/api/notes',(request,response) => {
+app.post('/api/notes',(request,response,next) => {
     const body = request.body
-
-    if(body.content === undefined){
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
 
     Note.findOne({content: body.content})
     .catch(error => {
@@ -111,27 +66,19 @@ app.post('/api/notes',(request,response) => {
     note.save().then(savedNote => {
         response.json(savedNote)
     })
+    .catch(error => next(error))
 })
 
 app.put('/api/notes/:id',(request,response,next) => {
-    const body = request.body
-
-    const note = {
-        content: body.content,
-        important: body.important,
-    }
+    const {content, important} = request.body
     
-    Note.findByIdAndUpdate(request.params.id, note, {new:true})
+    Note.findByIdAndUpdate(request.params.id,
+        {content, important}, 
+        {new:true, runValidators:true, context:'query'})
     .then(updatedNote => {
         response.json(updatedNote)
     })
     .catch(error => next(error))
-    // if(!notes.find(note => note.id === request.body.id)){
-    //     return response.status(404).json({error :'bad request'})
-    // }
-    // const newNotes = notes.map(note => note.id === request.body.id ? request.body : note)
-    // notes = newNotes
-    // response.json(newNotes)
 })
 
 //处理不支持路由的程序应该放在倒数第二个
@@ -147,6 +94,8 @@ const errorHandler = (error, request, response, next) => {
         return response.status(400).send({error:'malformated id'})
     }else if(error.name === 'No Content'){
         return response.status(400).send({error: 'data already been deleted'})
+    }else if(error.name ==='ValidationError'){
+        return response.status(400).json({ error: error.message })
     }
     
     next(error)
