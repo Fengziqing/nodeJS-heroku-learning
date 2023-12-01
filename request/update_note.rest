@@ -1,7 +1,7 @@
-PUT http://localhost:3001/api/notes/65475c0f920f842ba4580d35
+PUT http://localhost:3001/api/notes/655f1c3d035af36691df7578
 Content-Type: application/json
 
 {
-    "content": "callback-function suck",
-    "important": false
+    "content": "HTML is easy",
+    "important": true
 }

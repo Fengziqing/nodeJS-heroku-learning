@@ -1,7 +1,8 @@
 POST http://localhost:3001/api/notes
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhhcnUiLCJpZCI6IjY1NjFkMWJmYTU1Y2YwYzEzZTgyNzI3NiIsImlhdCI6MTcwMDkxNTM5MH0.C7Vd5horaMFq1qa8Zxkd3wba4UqX4WNFpO9QpDLQ_q8
 
 {
-    "content": "123",
+    "content": "university",
     "important": true
 }
